@@ -1,30 +1,15 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageContextScript } from "@/components/PageContextScript";
 import { Estimator } from "@/components/site/Estimator";
-import { Gallery, type GalleryPhoto } from "@/components/site/Gallery";
+import { CldImg } from "@/components/site/CldImg";
+import { Gallery } from "@/components/site/Gallery";
+import { getProperties, getProperty, pickPhoto } from "@/lib/content";
 import { ReservedCard } from "@/components/site/PropertyCard";
-import { PROPERTIES, SAMPLE_NOTICE, SITE } from "@/lib/content/sample";
-import heroImg from "@/public/preview/hero-aerial.jpg";
-import poolImg from "@/public/preview/pool.jpg";
-import dockImg from "@/public/preview/dock.jpg";
-import livingImg from "@/public/preview/living.jpg";
-import kitchenImg from "@/public/preview/kitchen.jpg";
-import sunsetImg from "@/public/preview/sunset.jpg";
-import islandsImg from "@/public/preview/islands.jpg";
+import { SAMPLE_NOTICE, SITE } from "@/lib/content/sample";
 
 type Params = Promise<{ island: string; property: string }>;
-
-const PHOTOS: GalleryPhoto[] = [
-  { src: heroImg, alt: "Aerial view of the home, pool and dock", category: "Exterior" },
-  { src: poolImg, alt: "Pool terrace with tiki hut", category: "Pool" },
-  { src: dockImg, alt: "Private dock with boat on a lift", category: "Waterfront" },
-  { src: livingImg, alt: "Living room opening to water views", category: "Interior" },
-  { src: kitchenImg, alt: "Kitchen with island and pendant lights", category: "Interior" },
-  { src: sunsetImg, alt: "Sunset over the dock", category: "Lifestyle" },
-];
 
 const ICONS: Record<string, React.ReactNode> = {
   "270 ft waterfront": <path d="M3 10c3-3 5-3 8 0s5 3 8 0M3 16c3-3 5-3 8 0s5 3 8 0" />,
@@ -35,27 +20,37 @@ const ICONS: Record<string, React.ReactNode> = {
   "Open water access": <path d="M12 4v3M12 17v3M4 12h3M17 12h3M6.5 6.5l2 2M15.5 15.5l2 2M6.5 17.5l2-2M15.5 8.5l2-2M12 9a3 3 0 100 6 3 3 0 000-6z" />,
 };
 
-const find = (island: string, slug: string) => PROPERTIES.find((p) => p.island === island && p.slug === slug);
+export const revalidate = 300;
 
-export function generateStaticParams() {
-  return PROPERTIES.map((p) => ({ island: p.island, property: p.slug }));
+export async function generateStaticParams() {
+  return (await getProperties()).map((p) => ({ island: p.island, property: p.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { island, property } = await params;
-  const p = find(island, property);
+  const p = await getProperty(island, property);
   if (!p) return {};
   return {
     title: `${p.address}, ${p.islandName}`,
-    description: `${p.headline} ${SAMPLE_NOTICE}`,
+    description: p.headline || p.description,
     alternates: { canonical: `/properties/${p.island}/${p.slug}` },
   };
 }
 
 export default async function Page({ params }: { params: Params }) {
   const { island, property } = await params;
-  const p = find(island, property);
+  const p = await getProperty(island, property);
   if (!p) notFound();
+
+  const used = new Set<string>();
+  const hero = pickPhoto(p.photos, used, []);
+  const trioA = pickPhoto(p.photos, used, ["Pool", "Exterior"]);
+  const trioB = pickPhoto(p.photos, used, ["Waterfront"]);
+  const trioC = pickPhoto(p.photos, used, ["Interior"]);
+  const residence = pickPhoto(p.photos, used, ["Interior"]);
+  const mood = pickPhoto(p.photos, used, ["Lifestyle", "Pool", "Waterfront"]);
+  const place = pickPhoto(p.photos, used, ["Exterior", "Waterfront"]);
+  const band = pickPhoto(p.photos, used, ["Exterior", "Waterfront"]);
 
   const mail = (subject: string) => `mailto:${SITE.email}?subject=${encodeURIComponent(subject)}`;
   const tabCls = "label whitespace-nowrap py-[18px] text-ocean no-underline hover:text-teal";
@@ -66,7 +61,7 @@ export default async function Page({ params }: { params: Params }) {
 
       {/* Hero */}
       <section className="relative flex min-h-[clamp(560px,80vh,800px)] flex-col justify-end bg-ocean">
-        <Image src={heroImg} alt={`Aerial view of ${p.address} with pool, tiki hut and private dock`} fill priority sizes="100vw" className="object-cover object-[60%_50%]" />
+        <CldImg photo={hero} priority />
         <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-[rgba(20,56,66,0.9)] via-[rgba(20,56,66,0.6)] to-[rgba(20,56,66,0.15)]" />
         <div className="wrap relative w-full pb-[clamp(40px,6vw,72px)] pt-16 text-paper">
           <nav aria-label="Breadcrumb" className="mb-5 text-[12px] tracking-[0.08em]">
@@ -104,22 +99,22 @@ export default async function Page({ params }: { params: Params }) {
             Request more information →
           </a>
         </div>
-        <p className="wrap pb-4 text-[13px]">{SAMPLE_NOTICE}</p>
+        {p.sample && <p className="wrap pb-4 text-[13px]">{SAMPLE_NOTICE}</p>}
       </section>
 
       {/* Three-image composition */}
       <section aria-label="Photographs" className="wrap flex flex-wrap gap-3 pt-[clamp(28px,4vw,48px)]">
         <div className="zoom relative aspect-[3/2] min-w-0 flex-[999_1_520px] bg-seaglass">
-          <Image src={poolImg} alt="Pool terrace with tiki hut and palms beside open water" fill sizes="(max-width: 900px) 100vw, 60vw" className="object-cover" />
+          <CldImg photo={trioA} sizes="(max-width: 900px) 100vw, 60vw" />
         </div>
         <div className="flex min-w-0 flex-[1_1_300px] flex-col gap-3">
           <div className="zoom relative min-h-[160px] flex-1 bg-seaglass">
-            <Image src={dockImg} alt="Private dock with boat on a lift" fill sizes="(max-width: 900px) 100vw, 40vw" className="object-cover" />
+            <CldImg photo={trioB} sizes="(max-width: 900px) 100vw, 40vw" />
           </div>
           <div className="zoom relative min-h-[160px] flex-1 bg-seaglass">
-            <Image src={livingImg} alt="Living room opening to water views" fill sizes="(max-width: 900px) 100vw, 40vw" className="object-cover" />
+            <CldImg photo={trioC} sizes="(max-width: 900px) 100vw, 40vw" />
             <a href="#gallery" className="btn btn-paper absolute bottom-3 right-3 !min-h-[44px] !px-5">
-              View all photos →
+              View all {p.photos.length} photos →
             </a>
           </div>
         </div>
@@ -133,15 +128,12 @@ export default async function Page({ params }: { params: Params }) {
           <h2 className="display mb-5">
             Island architecture. <em>Designed for a life well lived.</em>
           </h2>
-          <p className="max-w-[600px] text-[17px]">
-            A renovated waterfront residence on Sugarloaf Key, with indoor and outdoor living that opens to a heated pool, covered lounge
-            areas, a private dock and a boat lift. The full description will be written from the listing record.
-          </p>
+          <p className="max-w-[600px] text-[17px]">{p.description}</p>
           <ul className="mt-10 grid grid-cols-2 gap-x-6 gap-y-8 sm:grid-cols-3">
             {p.features.map((f) => (
               <li key={f} className="flex flex-col gap-3">
                 <svg aria-hidden="true" viewBox="0 0 24 24" className="h-9 w-9 fill-none stroke-ocean" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
-                  {ICONS[f]}
+                  {ICONS[f] ?? <circle cx="12" cy="12" r="4" />}
                 </svg>
                 <span className="label text-ink">{f}</span>
               </li>
@@ -150,7 +142,7 @@ export default async function Page({ params }: { params: Params }) {
         </div>
         <div className="flex min-w-0 flex-[1_1_340px] flex-col gap-3">
           <div className="zoom relative aspect-[5/4] bg-seaglass">
-            <Image src={kitchenImg} alt="Kitchen with island and woven pendant lights" fill sizes="(max-width: 900px) 100vw, 40vw" className="object-cover" />
+            <CldImg photo={residence} sizes="(max-width: 900px) 100vw, 40vw" />
           </div>
           <Link href={`/islands/${p.island}`} className="flex items-center justify-between bg-sand p-6 no-underline">
             <span>
@@ -162,10 +154,12 @@ export default async function Page({ params }: { params: Params }) {
         </div>
       </section>
 
+      {p.perspective && (
+        <>
       {/* James's Perspective */}
       <section id="perspective" className="flex flex-wrap bg-ocean">
         <div className="relative min-h-[320px] min-w-0 flex-[1_1_360px]">
-          <Image src={sunsetImg} alt="Sunset over the dock" fill sizes="(max-width: 900px) 100vw, 45vw" className="object-cover" />
+          <CldImg photo={mood} sizes="(max-width: 900px) 100vw, 45vw" />
         </div>
         <div className="min-w-0 flex-[1_1_460px] px-[clamp(24px,6vw,88px)] py-[clamp(48px,7vw,96px)] text-paper">
           <div className="label tracking-[0.24em]">James’s Perspective</div>
@@ -174,6 +168,8 @@ export default async function Page({ params }: { params: Params }) {
           <div className="label mt-6">— {SITE.advisor}</div>
         </div>
       </section>
+        </>
+      )}
 
       {/* Explore the details */}
       <nav aria-label="Explore the details" className="sticky top-[88px] z-30 border-b border-sand bg-paper">
@@ -190,10 +186,7 @@ export default async function Page({ params }: { params: Params }) {
       <section id="overview" className="wrap section flex flex-wrap gap-[clamp(32px,6vw,88px)]">
         <div className="min-w-0 flex-[1_1_420px]">
           <h2 className="mb-4 font-serif text-[34px] text-ocean">Property Overview</h2>
-          <p className="max-w-[560px]">
-            A waterfront retreat on Sugarloaf Key offering privacy, open water access and island living, with a private dock for boaters and
-            room for family.
-          </p>
+          <p className="max-w-[560px]">{p.description}</p>
         </div>
         <div className="min-w-0 flex-[1_1_260px]">
           <div className="label mb-3 text-mute">Key facts</div>
@@ -206,7 +199,7 @@ export default async function Page({ params }: { params: Params }) {
           </ul>
         </div>
         <div id="location" className="zoom relative min-h-[220px] min-w-0 flex-[1_1_300px] bg-seaglass">
-          <Image src={islandsImg} alt="Aerial of island and shallow water" fill sizes="(max-width: 900px) 100vw, 30vw" className="object-cover" />
+          <CldImg photo={place} sizes="(max-width: 900px) 100vw, 30vw" />
           <Link href={`/islands/${p.island}`} className="btn btn-paper absolute bottom-3 right-3 !min-h-[44px] !px-5">
             {p.islandName} guide →
           </Link>
@@ -215,7 +208,7 @@ export default async function Page({ params }: { params: Params }) {
 
       {/* Gallery */}
       <section id="gallery" className="pb-[clamp(56px,8vw,112px)]">
-        <Gallery photos={PHOTOS} />
+        <Gallery photos={p.photos} />
       </section>
 
       {/* Ownership estimator */}
@@ -288,7 +281,7 @@ export default async function Page({ params }: { params: Params }) {
 
       {/* Brand band */}
       <section className="relative flex min-h-[220px] items-center bg-ocean">
-        <Image src={islandsImg} alt="" fill sizes="100vw" className="object-cover" />
+        <CldImg photo={band} alt="" />
         <div aria-hidden className="absolute inset-0 bg-[rgba(20,56,66,0.62)]" />
         <div className="wrap relative flex w-full flex-wrap items-center justify-between gap-6 py-12">
           <p className="font-serif text-[clamp(30px,4vw,52px)] leading-tight text-paper">Island Living, Intelligent Decisions.</p>
@@ -298,7 +291,7 @@ export default async function Page({ params }: { params: Params }) {
         </div>
       </section>
 
-      <p className="wrap py-6 text-[13px]">{p.listingAttribution}</p>
+      {p.listingAttribution && <p className="wrap py-6 text-[13px]">{p.listingAttribution}</p>}
     </main>
   );
 }

@@ -32,7 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Skip to content
         </a>
         <div className="bg-sand px-4 py-2 text-center text-[12px] tracking-[0.04em]">
-          Preview build · sample imagery and listing details · not yet a published site
+          Preview build · sample listing · not yet a published site
         </div>
         <Header />
         <div id="content">{children}</div>

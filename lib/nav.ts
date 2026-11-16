@@ -60,3 +60,7 @@ export const NAV: NavGroup[] = [
 ];
 
 export const INQUIRE = { label: "Inquire", href: "/inquire" };
+
+/** Private buyer, seller and admin workspace (Base44). Sign-up and sign-in happen there, not on the public site. */
+const WORKSPACE = process.env.NEXT_PUBLIC_WORKSPACE_URL ?? "https://vivacious-island-home-intel.base44.app";
+export const ACCOUNT = { signIn: `${WORKSPACE}/dashboard`, signUp: `${WORKSPACE}/dashboard?welcome=1` };

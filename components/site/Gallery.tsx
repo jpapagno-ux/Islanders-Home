@@ -1,13 +1,10 @@
 "use client";
 
-import Image, { type StaticImageData } from "next/image";
+import { CldImg } from "@/components/site/CldImg";
+import type { Photo } from "@/lib/content/sample";
 import { useEffect, useRef, useState } from "react";
 
-export interface GalleryPhoto {
-  src: StaticImageData;
-  alt: string;
-  category: string;
-}
+export type GalleryPhoto = Photo;
 
 const CATEGORIES = ["All", "Exterior", "Interior", "Waterfront", "Pool", "Lifestyle", "Floorplans"];
 
@@ -73,19 +70,19 @@ export function Gallery({ photos }: { photos: GalleryPhoto[] }) {
       <div ref={rail} className="rail flex gap-3.5 overflow-x-auto px-[clamp(20px,5vw,64px)] pb-4">
         {shown.map((p, i) => (
           <button
-            key={p.alt}
+            key={p.publicId}
             type="button"
             aria-label={`Open full screen: ${p.alt}`}
             onClick={() => setLight(i)}
             className="zoom relative aspect-[3/2] flex-[0_0_clamp(280px,62vw,760px)] cursor-zoom-in bg-seaglass"
           >
-            <Image src={p.src} alt={p.alt} fill sizes="(max-width: 768px) 80vw, 760px" className="object-cover" />
+            <CldImg photo={p} sizes="(max-width: 768px) 80vw, 760px" />
             <span className="label absolute bottom-0 left-0 bg-paper px-3.5 py-2 text-ocean">{p.category}</span>
           </button>
         ))}
         {shown.length === 0 && (
           <div className="flex min-h-[240px] flex-[1_1_100%] items-end bg-sand p-8 font-serif text-[26px] text-ocean">
-            Floorplans have not been supplied yet.
+            No photographs in this category yet.
           </div>
         )}
       </div>
@@ -102,7 +99,7 @@ export function Gallery({ photos }: { photos: GalleryPhoto[] }) {
             </button>
           </div>
           <div className="relative min-h-0 flex-1">
-            <Image src={current.src} alt={current.alt} fill sizes="100vw" className="object-contain" />
+            <CldImg photo={current} sizes="100vw" contain priority />
           </div>
           <div className="flex justify-center gap-3 p-4">
             <button type="button" aria-label="Previous photograph" className="h-[52px] w-14 cursor-pointer border border-paper text-[20px] text-paper" onClick={() => setLight((i) => (i ?? 0) - 1)}>

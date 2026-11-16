@@ -2,11 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { PageContextScript } from "@/components/PageContextScript";
 import { PropertyCard, ReservedCard } from "@/components/site/PropertyCard";
-import { COLLECTIONS, ISLANDS, PROPERTIES, SITE } from "@/lib/content/sample";
-import heroImg from "@/public/preview/hero-aerial.jpg";
-import poolImg from "@/public/preview/pool.jpg";
-import sunsetImg from "@/public/preview/sunset.jpg";
-import verandaImg from "@/public/preview/veranda.jpg";
+import { CldImg } from "@/components/site/CldImg";
+import { getProperties } from "@/lib/content";
+import { COLLECTIONS, ISLANDS, SITE, SITE_PHOTOS } from "@/lib/content/sample";
 import islandsImg from "@/public/preview/islands.jpg";
 import boatImg from "@/public/preview/boat.jpg";
 
@@ -41,8 +39,11 @@ const INTEL = [
   },
 ];
 
-export default function Page() {
-  const featured = PROPERTIES[0];
+export const revalidate = 300;
+
+export default async function Page() {
+  const properties = await getProperties();
+  const featured = properties.slice(0, 4);
   const selectCls = "min-h-[32px] bg-transparent py-1 text-[16px] text-ink";
   const fieldCls = "flex flex-[1_1_180px] flex-col gap-0.5 border-b border-sand px-5 py-3.5 md:border-b-0 md:border-r";
 
@@ -52,7 +53,7 @@ export default function Page() {
 
       {/* 1–4 Hero, headline, subheading, search */}
       <section className="relative flex min-h-[clamp(560px,82vh,820px)] flex-col justify-end bg-ocean">
-        <Image src={poolImg} alt="Pool terrace with tiki hut and palms beside open water in the Florida Keys" fill priority sizes="100vw" className="object-cover" />
+        <CldImg photo={SITE_PHOTOS.homeHero} priority />
         <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-[rgba(20,56,66,0.88)] via-[rgba(20,56,66,0.5)] to-[rgba(20,56,66,0.12)]" />
         <div className="wrap relative w-full pb-[clamp(36px,6vw,72px)] pt-16">
           <h1 className="font-serif text-[clamp(46px,8vw,104px)] leading-[0.98] text-paper">
@@ -110,16 +111,20 @@ export default function Page() {
           </Link>
         </div>
         <div className="grid gap-7 sm:grid-cols-2 lg:grid-cols-4">
-          <PropertyCard property={featured} image={heroImg} alt="Aerial view of 17015 W Wahoo Lane with pool and private dock" />
-          <ReservedCard tone="seaglass">A second curated home, selected by James</ReservedCard>
-          <ReservedCard>A third curated home, selected by James</ReservedCard>
-          <ReservedCard tone="seaglass">A fourth curated home, selected by James</ReservedCard>
+          {featured.map((prop) => (
+            <PropertyCard key={prop.id} property={prop} />
+          ))}
+          {Array.from({ length: 4 - featured.length }, (_, i) => (
+            <ReservedCard key={i} tone={i % 2 ? "sand" : "seaglass"}>
+              A curated home, selected by James
+            </ReservedCard>
+          ))}
         </div>
       </section>
 
       {/* More than homes band */}
       <section className="relative flex min-h-[clamp(320px,44vw,520px)] items-center bg-ocean">
-        <Image src={sunsetImg} alt="Sunset over a private dock and boat lift" fill sizes="100vw" className="object-cover" />
+        <CldImg photo={SITE_PHOTOS.band} />
         <div aria-hidden className="absolute inset-0 bg-[rgba(20,56,66,0.5)]" />
         <div className="wrap relative flex w-full flex-wrap items-end justify-between gap-6">
           <h2 className="font-serif text-[clamp(36px,5.4vw,72px)] leading-[1.02] text-paper">
@@ -137,7 +142,7 @@ export default function Page() {
       <section className="bg-sand">
         <div className="wrap section flex flex-wrap items-center gap-[clamp(32px,6vw,88px)]">
           <div className="zoom relative aspect-[4/5] max-h-[640px] min-w-0 flex-[1_1_360px] bg-seaglass">
-            <Image src={verandaImg} alt="Palms and water seen from a covered veranda" fill sizes="(max-width: 900px) 100vw, 45vw" className="object-cover" />
+            <CldImg photo={SITE_PHOTOS.collection} sizes="(max-width: 900px) 100vw, 45vw" />
           </div>
           <div className="min-w-0 flex-[1_1_420px]">
             <div className="eyebrow">The Islanders Collection™</div>

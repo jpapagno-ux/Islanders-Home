@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PageContextScript } from "@/components/PageContextScript";
 import { PropertyCard, ReservedCard } from "@/components/site/PropertyCard";
-import { PROPERTIES, SAMPLE_NOTICE } from "@/lib/content/sample";
-import heroImg from "@/public/preview/hero-aerial.jpg";
+import { getProperties } from "@/lib/content";
+import { SAMPLE_NOTICE } from "@/lib/content/sample";
 
 export const metadata: Metadata = {
   title: "Properties",
@@ -11,7 +11,10 @@ export const metadata: Metadata = {
   alternates: { canonical: "/properties" },
 };
 
-export default function Page() {
+export const revalidate = 300;
+
+export default async function Page() {
+  const properties = await getProperties();
   return (
     <main>
       <PageContextScript page_type="property_search" journey="buyer" />
@@ -27,13 +30,13 @@ export default function Page() {
       </section>
       <section className="wrap section">
         <div className="grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
-          {PROPERTIES.map((p) => (
-            <PropertyCard key={p.id} property={p} image={heroImg} alt={`Aerial view of ${p.address}`} />
+          {properties.map((p) => (
+            <PropertyCard key={p.id} property={p} />
           ))}
           <ReservedCard tone="seaglass">More curated homes are being selected</ReservedCard>
           <ReservedCard>The Islanders Collection™ opens with its first five categories</ReservedCard>
         </div>
-        <p className="mt-8 text-[13px]">{SAMPLE_NOTICE}</p>
+        {properties.some((p) => p.sample) && <p className="mt-8 text-[13px]">{SAMPLE_NOTICE}</p>}
         <div className="mt-8 flex flex-wrap gap-3">
           <Link href="/properties/collection" className="btn btn-line">
             The Islanders Collection™

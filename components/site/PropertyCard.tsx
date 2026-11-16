@@ -1,14 +1,15 @@
-import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
-import { propertyHref, type SampleProperty } from "@/lib/content/sample";
+import { CldImg } from "@/components/site/CldImg";
+import { propertyHref, type Property } from "@/lib/content/sample";
 
 /** Borderless, image-led property card from the approved Properties board. */
-export function PropertyCard({ property, image, alt }: { property: SampleProperty; image: StaticImageData; alt: string }) {
+export function PropertyCard({ property }: { property: Property }) {
+  const photo = property.photos.find((ph) => ph.hero) ?? property.photos[0];
   const brief = property.facts.filter((f) => ["Bedrooms", "Bathrooms", "Sq ft"].includes(f.label));
   return (
     <Link href={propertyHref(property)} className="zoom group block text-ink no-underline">
       <div className="relative aspect-[4/3] overflow-hidden bg-seaglass">
-        <Image src={image} alt={alt} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="object-cover" />
+        <CldImg photo={photo} sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" />
       </div>
       <div className="pt-4">
         <div className="font-serif text-[24px] leading-tight text-ocean">{property.address}</div>
