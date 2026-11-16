@@ -65,6 +65,8 @@ export interface Property {
   perspective: string;
   listingAttribution: string;
   sample: boolean;
+  /** Residence | New Construction | New Development | Vacant Lot */
+  type: string;
   photos: Photo[];
 }
 
@@ -138,6 +140,7 @@ export const SAMPLE_PROPERTIES: Property[] = [
     listingAttribution:
       "Photographs and listing information shown with permission through IDX and the Florida Keys MLS. Listing courtesy of Lisa Ferringo, Coldwell Banker Schmitt Real Estate Co. MLS #621652. Information is deemed reliable but is not guaranteed.",
     sample: true,
+    type: "Residence",
     photos: WAHOO_PHOTOS,
   },
 ];

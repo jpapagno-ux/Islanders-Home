@@ -14,7 +14,10 @@ export const NAV: NavGroup[] = [
     items: [
       { label: "All Properties", href: "/properties" },
       { label: "The Islanders Collection™", href: "/properties/collection" },
-      { label: "17015 W Wahoo Lane", href: "/properties/sugarloaf-key/17015-w-wahoo-lane" },
+      { label: "New Construction", href: "/properties/new-construction" },
+      { label: "New Developments", href: "/properties/new-developments" },
+      { label: "Lots and Land", href: "/properties/lots-and-land" },
+      { label: "Build Your Island Dream Home", href: "/build" },
     ],
   },
   {

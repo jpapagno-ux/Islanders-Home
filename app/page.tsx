@@ -191,6 +191,28 @@ export default async function Page() {
         </div>
       </section>
 
+      {/* Build your island dream home */}
+      <section className="wrap section flex flex-wrap items-end justify-between gap-8">
+        <div className="min-w-0 flex-[1_1_520px]">
+          <div className="eyebrow">Lots · New construction · New developments</div>
+          <div className="rule" />
+          <h2 className="display mb-4">
+            Build your island <em>dream home.</em>
+          </h2>
+          <p className="max-w-[560px]">
+            Call us first. We guide you through finding the land, acquiring it and building on it, step by step.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <a href={SITE.phoneHref} className="btn btn-ocean">
+            Call James · {SITE.phoneDisplay}
+          </a>
+          <Link href="/build" className="btn btn-line">
+            How we guide you →
+          </Link>
+        </div>
+      </section>
+
       {/* 8 Island Intelligence */}
       <section className="bg-sand">
         <div className="wrap section">

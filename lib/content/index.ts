@@ -101,6 +101,7 @@ function toProperty(rec: AirtableRecord, islandsById: Map<string, AirtableRecord
       ? `Listing courtesy of ${agent ? `${agent}, ` : ""}${brokerage}.${mls ? ` MLS #${mls}.` : ""} Information is deemed reliable but is not guaranteed.`
       : "",
     sample: str(f["Listing Status"]) === "Sample",
+    type: str(f["Property Type"]) || "Residence",
     photos,
   };
 }
