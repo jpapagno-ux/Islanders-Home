@@ -8,7 +8,8 @@ import { CONSENT_TEXT } from "@/lib/inquiry/types";
  * browser code (enforced by "server-only").
  *
  * Base44 entity REST: POST {BASE44_API_URL}/api/apps/{appId}/entities/{Entity}
- * with header `api_key`.
+ * with header `Authorization: Bearer <personal access token>` (Base44 retired
+ * account API keys sent as `api_key` on 2026-10-15).
  */
 const APP_ID = process.env.BASE44_APP_ID ?? "6a607f956dd4d6379540f0f3";
 const API_URL = (process.env.BASE44_API_URL ?? "https://app.base44.com").replace(/\/$/, "");
@@ -50,7 +51,7 @@ export async function createInquiry(p: InquiryPayload): Promise<CreatedInquiry> 
 
   const res = await fetch(`${API_URL}/api/apps/${APP_ID}/entities/Inquiry`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", api_key: key },
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
     body: JSON.stringify(record),
     cache: "no-store",
   });
