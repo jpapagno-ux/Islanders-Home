@@ -8,6 +8,8 @@ import { Gallery } from "@/components/site/Gallery";
 import { getProperties, getProperty, pickPhoto } from "@/lib/content";
 import { ReservedCard } from "@/components/site/PropertyCard";
 import { SAMPLE_NOTICE, SITE } from "@/lib/content/sample";
+import { InquiryForm } from "@/components/site/InquiryForm";
+import { saveUrl } from "@/lib/desk";
 
 type Params = Promise<{ island: string; property: string }>;
 
@@ -52,7 +54,6 @@ export default async function Page({ params }: { params: Params }) {
   const place = pickPhoto(p.photos, used, ["Exterior", "Waterfront"]);
   const band = pickPhoto(p.photos, used, ["Exterior", "Waterfront"]);
 
-  const mail = (subject: string) => `mailto:${SITE.email}?subject=${encodeURIComponent(subject)}`;
   const tabCls = "label whitespace-nowrap py-[18px] text-ocean no-underline hover:text-teal";
 
   return (
@@ -74,8 +75,11 @@ export default async function Page({ params }: { params: Params }) {
           <h1 className="font-serif text-[clamp(44px,7vw,92px)] leading-none">{p.address}</h1>
           <p className="mb-8 mt-5 max-w-[560px] font-serif text-[clamp(22px,2.6vw,32px)] leading-[1.2]">{p.headline}</p>
           <div className="flex flex-wrap gap-3">
-            <a href={mail(`Private tour request: ${p.address}`)} className="btn btn-line-light">
-              Schedule a private tour →
+            <a href="#inquire" className="btn btn-paper">
+              Request a showing →
+            </a>
+            <a href={saveUrl(p.id)} className="btn btn-line-light" rel="nofollow">
+              Save this home
             </a>
             <a href="#gallery" className="btn btn-line-light">
               View gallery
@@ -95,8 +99,8 @@ export default async function Page({ params }: { params: Params }) {
               </div>
             ))}
           </dl>
-          <a href={mail(`Request for information: ${p.address}`)} className="btn btn-gold mb-6 flex-[1_1_240px] md:mb-0">
-            Request more information →
+          <a href="#inquire" className="btn btn-gold mb-6 flex-[1_1_240px] md:mb-0">
+            Request an Island Home Brief™ →
           </a>
         </div>
         {p.sample && <p className="wrap pb-4 text-[13px]">{SAMPLE_NOTICE}</p>}
@@ -236,11 +240,16 @@ export default async function Page({ params }: { params: Params }) {
             reading. Reports are prepared and reviewed by hand, never generated automatically.
           </p>
         </div>
-        <div className="min-w-0 flex-[1_1_300px] border-t border-ocean pt-6">
-          <a href={mail(`Island Value Report request: ${p.address}`)} className="btn btn-ocean w-full">
-            Request my private report
-          </a>
-          <p className="mt-3 text-[13px]">Opens an email to James. Include the valuation date you have in mind.</p>
+        <div className="min-w-0 flex-[1_1_360px] border-t border-ocean pt-6">
+          <InquiryForm
+            types={["request_value_report"]}
+            propertyRef={p.id}
+            propertyAddress={p.address}
+            islandRef={p.island}
+            askTimeline={false}
+            messageLabel="Valuation date you have in mind, and anything else James should know"
+            submitLabel="Request my private report"
+          />
         </div>
       </section>
 
@@ -258,7 +267,7 @@ export default async function Page({ params }: { params: Params }) {
       </section>
 
       {/* Inquiry */}
-      <section id="inquire" className="wrap section flex flex-wrap items-end justify-between gap-8">
+      <section id="inquire" className="wrap section flex flex-wrap items-start justify-between gap-[clamp(32px,6vw,88px)]">
         <div>
           <div className="eyebrow">Inquire about this home</div>
           <div className="rule" />
@@ -269,13 +278,19 @@ export default async function Page({ params }: { params: Params }) {
             {SITE.advisor} · {SITE.brokerage}
           </p>
         </div>
-        <div className="flex flex-wrap gap-3">
-          <a href={mail(`Inquiry: ${p.address}`)} className="btn btn-ocean">
-            Email James
-          </a>
-          <a href={SITE.phoneHref} className="btn btn-line">
-            Call {SITE.phoneDisplay}
-          </a>
+        <div className="min-w-0 flex-[1_1_460px]">
+          <InquiryForm
+            types={["request_showing", "request_island_home_brief", "general"]}
+            propertyRef={p.id}
+            propertyAddress={p.address}
+            islandRef={p.island}
+          />
+          <p className="mt-4 text-[14px]">
+            Prefer to talk?{" "}
+            <a href={SITE.phoneHref} className="underline underline-offset-4">
+              Call {SITE.phoneDisplay}
+            </a>
+          </p>
         </div>
       </section>
 

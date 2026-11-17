@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { InquiryForm } from "@/components/site/InquiryForm";
 import { PageContextScript } from "@/components/PageContextScript";
 import { CldImg } from "@/components/site/CldImg";
 import { SITE, SITE_PHOTOS } from "@/lib/content/sample";
@@ -65,9 +66,27 @@ export default function Page() {
           <Link href="/properties/new-developments" className="btn btn-line">
             New developments
           </Link>
-          <Link href="/inquire" className="btn btn-ocean">
-            Schedule a consultation
-          </Link>
+          <a href="#build-inquiry" className="btn btn-ocean">
+            Start the conversation
+          </a>
+        </div>
+      </section>
+      <section id="build-inquiry" className="bg-sand">
+        <div className="wrap section flex flex-wrap gap-[clamp(32px,6vw,88px)]">
+          <div className="min-w-0 flex-[1_1_380px]">
+            <div className="eyebrow">Build or renovate</div>
+            <div className="rule" />
+            <h2 className="display mb-4">
+              Tell James about <em>the home you have in mind.</em>
+            </h2>
+            <p className="max-w-[520px] text-[15px]">
+              Land you are considering, a lot you already own, or a renovation of an existing home — James will reply with a first read on
+              feasibility, permitting and the right partners.
+            </p>
+          </div>
+          <div className="min-w-0 flex-[1_1_420px]">
+            <InquiryForm types={["build_interest"]} askAddress messageLabel="The lot, home or idea you have in mind" />
+          </div>
         </div>
       </section>
     </main>

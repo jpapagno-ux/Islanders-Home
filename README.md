@@ -34,3 +34,11 @@ npm install
 cp .env.example .env.local
 npm run dev
 ```
+
+## Private desk integration (Project 01 doc 39 / 41)
+
+- **Sign in / Create account / Save** link to the published Base44 desk (`NEXT_PUBLIC_DESK_URL`), never the editor preview.
+- **`POST /api/inquiry`** is the only write path: validates, honeypot, rate-limits, then creates an `Inquiry` in Base44 with the server-side `BASE44_API_KEY`. The site stores no personal data.
+- `inquiry_type` values and the analytics event names are the exact Base44 / doc 31 values (`lib/inquiry/types.ts`). Inquiry events are sent server-side (GA4 Measurement Protocol) only after Base44 confirms, with no name/email/phone.
+- Forms: property page (showing, Island Home Brief™, general; Island Value Report™), `/inquire`, `/sell`, `/build`, `/island-intelligence#value-report`.
+- Required Vercel env (Production): `AIRTABLE_TOKEN`, `BASE44_API_KEY`, `NEXT_PUBLIC_DESK_URL`; optional `GA4_API_SECRET`. See `.env.example`.

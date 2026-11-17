@@ -2,6 +2,7 @@ import Link from "next/link";
 import { NAV } from "@/lib/nav";
 import { SITE } from "@/lib/content/sample";
 import { Wordmark } from "@/components/site/Header";
+import { BrokerageLine } from "@/components/site/BrokerageLine";
 
 const LEGAL = [
   { label: "Privacy Policy", href: "/privacy" },
@@ -60,7 +61,10 @@ export function Footer() {
         </div>
         <div className="mt-12 flex flex-wrap justify-between gap-x-8 gap-y-2 border-t border-paper/30 pt-5 text-[13px]">
           <span>© 2026 The Islanders Home. All rights reserved.</span>
-          <span>Brokerage licence line, office address and Equal Housing Opportunity statement pending confirmation.</span>
+          <span>Equal Housing Opportunity. Listing information is deemed reliable but not guaranteed; see each property for listing attribution.</span>
+        </div>
+        <div className="mt-6">
+          <BrokerageLine light />
         </div>
       </div>
     </footer>

@@ -1,4 +1,5 @@
 import { ISLANDS } from "@/lib/content/sample";
+import { signInUrl, signUpUrl } from "@/lib/desk";
 
 export interface NavGroup {
   label: string;
@@ -64,6 +65,5 @@ export const NAV: NavGroup[] = [
 
 export const INQUIRE = { label: "Inquire", href: "/inquire" };
 
-/** Private buyer, seller and admin workspace (Base44). Sign-up and sign-in happen there, not on the public site. */
-const WORKSPACE = process.env.NEXT_PUBLIC_WORKSPACE_URL ?? "https://vivacious-island-home-intel.base44.app";
-export const ACCOUNT = { signIn: `${WORKSPACE}/dashboard`, signUp: `${WORKSPACE}/dashboard?welcome=1` };
+/** Private buyer, seller and admin desk (Base44, published app). Sign-up and sign-in happen there, not on the public site. */
+export const ACCOUNT = { signIn: signInUrl(), signUp: signUpUrl() };
