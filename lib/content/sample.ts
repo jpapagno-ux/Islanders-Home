@@ -16,6 +16,8 @@ export const SITE = {
   email: "Jpapagno@BHSusa.com",
   phoneDisplay: "561.479.6355",
   phoneHref: "tel:+15614796355",
+  officeAddress: "7500 Red Road, Suite A, South Miami, FL 33143",
+  nmls: "461234",
 };
 
 export interface Island {

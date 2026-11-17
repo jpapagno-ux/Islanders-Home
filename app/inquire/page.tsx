@@ -1,13 +1,13 @@
 import { PageContextScript } from "@/components/PageContextScript";
 import { SITE } from "@/lib/content/sample";
+import { InquiryForm } from "@/components/site/InquiryForm";
+import { BrokerageLine } from "@/components/site/BrokerageLine";
 
 export const metadata = {
   title: "Inquire",
   description: "Contact James Papagno of Brown Harris Stevens about island and waterfront homes in the Florida Keys.",
   alternates: { canonical: "/inquire" },
 };
-
-const REQUESTS = ["Request a Property Tour", "Request a Property Review", "Schedule a Consultation", "General Inquiry"];
 
 export default function Page() {
   return (
@@ -26,25 +26,17 @@ export default function Page() {
       </section>
       <section className="wrap section flex flex-wrap gap-[clamp(32px,6vw,88px)]">
         <div className="min-w-0 flex-[1_1_380px]">
-          {REQUESTS.map((r) => (
-            <a
-              key={r}
-              href={`mailto:${SITE.email}?subject=${encodeURIComponent(r)}`}
-              className="flex items-baseline justify-between gap-4 border-t border-ocean/30 py-5 no-underline"
-            >
-              <span className="font-serif text-[clamp(26px,2.8vw,34px)] leading-tight text-ocean">{r}</span>
-              <span aria-hidden className="text-ocean">
-                →
-              </span>
-            </a>
-          ))}
-          <p className="mt-4 text-[13px]">Each option opens an email to James. An on-site inquiry form follows in the next build stage.</p>
+          <InquiryForm
+            types={["consultation", "general", "investor_inquiry", "finance_interest", "partner_inquiry"]}
+            askTimeline
+            intro="Tell James a little about what you have in mind. Your note goes to his private desk and he replies personally."
+          />
         </div>
         <div className="min-w-0 flex-[1_1_300px] bg-ocean p-[clamp(24px,3vw,40px)] text-paper">
           <div className="label">Prefer to talk?</div>
           <div className="rule" />
           <p className="font-serif text-[30px] leading-tight">{SITE.advisor}</p>
-          <p className="mb-6">{SITE.brokerage}</p>
+          <div className="mb-6"><BrokerageLine light compact /></div>
           <a href={SITE.phoneHref} className="btn btn-paper mb-3 w-full">
             Call {SITE.phoneDisplay}
           </a>
