@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ACCOUNT, INQUIRE, NAV } from "@/lib/nav";
+import { ACCOUNT, INQUIRE, buildNav, type NavRegion } from "@/lib/nav";
 
 export function Wordmark({ light = false }: { light?: boolean }) {
   return (
@@ -18,8 +18,9 @@ export function Wordmark({ light = false }: { light?: boolean }) {
   );
 }
 
-export function Header() {
+export function Header({ regions }: { regions: NavRegion[] }) {
   const [open, setOpen] = useState(false);
+  const NAV = buildNav(regions);
   const linkCls = "whitespace-nowrap text-[11px] font-medium uppercase tracking-[0.14em] text-ocean no-underline hover:text-teal 2xl:text-[12px] 2xl:tracking-[0.18em]";
 
   return (

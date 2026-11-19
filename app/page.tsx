@@ -3,8 +3,8 @@ import Link from "next/link";
 import { PageContextScript } from "@/components/PageContextScript";
 import { PropertyCard, ReservedCard } from "@/components/site/PropertyCard";
 import { CldImg } from "@/components/site/CldImg";
-import { getProperties } from "@/lib/content";
-import { COLLECTIONS, ISLANDS, SITE, SITE_PHOTOS } from "@/lib/content/sample";
+import { getProperties, getRegionGroups } from "@/lib/content";
+import { COLLECTIONS, SITE, SITE_PHOTOS } from "@/lib/content/sample";
 import islandsImg from "@/public/preview/islands.jpg";
 import boatImg from "@/public/preview/boat.jpg";
 
@@ -42,7 +42,7 @@ const INTEL = [
 export const revalidate = 300;
 
 export default async function Page() {
-  const properties = await getProperties();
+  const [properties, groups] = await Promise.all([getProperties(), getRegionGroups()]);
   const featured = properties.slice(0, 4);
   const selectCls = "min-h-[32px] bg-transparent py-1 text-[16px] text-ink";
   const fieldCls = "flex flex-[1_1_180px] flex-col gap-0.5 border-b border-sand px-5 py-3.5 md:border-b-0 md:border-r";
@@ -69,10 +69,14 @@ export default async function Page() {
               <span className="label text-ocean">Location</span>
               <select name="island" className={selectCls} defaultValue="">
                 <option value="">Any island</option>
-                {ISLANDS.map((i) => (
-                  <option key={i.slug} value={i.slug}>
-                    {i.name}
-                  </option>
+                {groups.map((g) => (
+                  <optgroup key={g.region.slug} label={g.region.name}>
+                    {g.islands.map((i) => (
+                      <option key={i.slug} value={i.slug}>
+                        {i.name}
+                      </option>
+                    ))}
+                  </optgroup>
                 ))}
               </select>
             </label>
@@ -178,12 +182,17 @@ export default async function Page() {
         </h2>
         <div className="flex flex-wrap gap-[clamp(28px,5vw,72px)]">
           <div className="min-w-0 flex-[1_1_340px]">
-            {ISLANDS.map((isl) => (
-              <Link key={isl.slug} href={`/islands/${isl.slug}`} className="flex items-baseline justify-between gap-4 border-t border-ocean/25 py-4 no-underline">
-                <span className="font-serif text-[clamp(26px,2.8vw,34px)] leading-tight text-ocean">{isl.name}</span>
-                <span className="label text-mute">{isl.area}</span>
+            {groups.map((g) => (
+              <Link key={g.region.slug} href={`/islands/${g.region.slug}`} className="flex items-baseline justify-between gap-4 border-t border-ocean/25 py-4 no-underline">
+                <span className="font-serif text-[clamp(26px,2.8vw,34px)] leading-tight text-ocean">{g.region.name}</span>
+                <span className="label text-mute">
+                  {g.islands.length} {g.islands.length === 1 ? "island" : "islands"}
+                </span>
               </Link>
             ))}
+            <Link href="/islands" className="label mt-5 inline-block border-b border-gold pb-1.5 text-ocean no-underline">
+              See every island →
+            </Link>
           </div>
           <div className="zoom relative min-h-[320px] min-w-0 flex-[1.3_1_420px] bg-seaglass">
             <Image src={islandsImg} alt="Aerial of a small wooded island in clear shallow water" fill sizes="(max-width: 900px) 100vw, 55vw" className="object-cover" />

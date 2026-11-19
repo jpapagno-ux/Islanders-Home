@@ -9,6 +9,7 @@ import "./globals.css";
 import { MeasurementTag } from "@/components/MeasurementTag";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
+import { getRegionGroups } from "@/lib/content";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://islanders-home.vercel.app";
 
@@ -21,7 +22,8 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const regions = (await getRegionGroups()).map((g) => ({ name: g.region.name, slug: g.region.slug }));
   return (
     <html lang="en">
       <head>
@@ -34,7 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div className="bg-sand px-4 py-2 text-center text-[12px] tracking-[0.04em]">
           Preview build · sample listing · not yet a published site
         </div>
-        <Header />
+        <Header regions={regions} />
         <div id="content">{children}</div>
         <Footer />
       </body>

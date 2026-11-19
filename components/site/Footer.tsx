@@ -1,8 +1,10 @@
 import Link from "next/link";
-import { NAV } from "@/lib/nav";
+import { buildNav } from "@/lib/nav";
 import { SITE } from "@/lib/content/sample";
 import { Wordmark } from "@/components/site/Header";
 import { BrokerageLine } from "@/components/site/BrokerageLine";
+
+const NAV = buildNav([]);
 
 const LEGAL = [
   { label: "Privacy Policy", href: "/privacy" },
