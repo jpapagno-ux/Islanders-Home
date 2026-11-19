@@ -1,3 +1,4 @@
+import { AgentJsonLd } from "@/components/AgentJsonLd";
 import Link from "next/link";
 import { buildNav } from "@/lib/nav";
 import { SITE } from "@/lib/content/sample";
@@ -16,6 +17,8 @@ const LEGAL = [
 
 export function Footer() {
   return (
+    <>
+    <AgentJsonLd />
     <footer className="bg-ocean text-paper">
       <div className="wrap pb-9 pt-[clamp(56px,7vw,96px)]">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
@@ -70,5 +73,6 @@ export function Footer() {
         </div>
       </div>
     </footer>
+    </>
   );
 }

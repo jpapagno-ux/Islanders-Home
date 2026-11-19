@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ListingJsonLd } from "@/components/ListingJsonLd";
 import { PageContextScript } from "@/components/PageContextScript";
 import { Estimator } from "@/components/site/Estimator";
 import { CldImg } from "@/components/site/CldImg";
@@ -59,6 +60,7 @@ export default async function Page({ params }: { params: Params }) {
   return (
     <main>
       <PageContextScript page_type="property" journey="buyer" property_id={p.id} island_id={p.island} />
+      <ListingJsonLd property={p} hero={hero} />
 
       {/* Hero */}
       <section className="relative flex min-h-[clamp(560px,80vh,800px)] flex-col justify-end bg-ocean">

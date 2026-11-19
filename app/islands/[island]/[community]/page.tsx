@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Placeholder } from "@/components/Placeholder";
-import { PlaceJsonLd } from "@/components/PlaceJsonLd";
+import { PlaceGuide } from "@/components/site/PlaceGuide";
 import { getPlace } from "@/lib/content";
 
 type Params = Promise<{ island: string; community: string }>;
@@ -34,15 +33,12 @@ export default async function Page({ params }: { params: Params }) {
   const { place, parent } = found;
   const region = parent ? await getPlace(parent.parent) : undefined;
   return (
-    <>
-    {/* This layout does not show facts or questions yet, so they are left out of the markup too. */}
-    <PlaceJsonLd place={{ ...place, facts: [], qa: [] }} trail={[...(region ? [region] : []), ...(parent ? [parent] : [])]} />
-    <Placeholder
-      title={place.name}
-      eyebrow={parent ? `Community · ${parent.name}` : "Community"}
-      lede={place.summary || place.overview || `The ${place.name} community guide is being written from first-hand knowledge and verified sources.`}
+    <PlaceGuide
+      place={place}
+      trail={[...(region ? [region] : []), ...(parent ? [parent] : [])]}
+      communities={[]}
+      homes={[]}
       context={{ page_type: "community", journey: "buyer", island_id: island, community_id: place.slug }}
     />
-    </>
   );
 }
