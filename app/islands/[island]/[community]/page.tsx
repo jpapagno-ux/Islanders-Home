@@ -35,7 +35,8 @@ export default async function Page({ params }: { params: Params }) {
   const region = parent ? await getPlace(parent.parent) : undefined;
   return (
     <>
-    <PlaceJsonLd place={place} trail={[...(region ? [region] : []), ...(parent ? [parent] : [])]} />
+    {/* This layout does not show facts or questions yet, so they are left out of the markup too. */}
+    <PlaceJsonLd place={{ ...place, facts: [], qa: [] }} trail={[...(region ? [region] : []), ...(parent ? [parent] : [])]} />
     <Placeholder
       title={place.name}
       eyebrow={parent ? `Community · ${parent.name}` : "Community"}
