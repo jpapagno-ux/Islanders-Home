@@ -40,6 +40,13 @@ export interface Place {
   overview: string;
   facts: Fact[];
   qa: QA[];
+  /** One or two sentences saying what and where the place is. */
+  summary?: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  /** Centre point, decimal degrees. */
+  latitude?: number;
+  longitude?: number;
 }
 
 const BASE = process.env.AIRTABLE_BASE_ID ?? "appJNZcT05lithwCl";
@@ -47,9 +54,10 @@ const TOKEN = process.env.AIRTABLE_TOKEN;
 const REVALIDATE_SECONDS = 300;
 const TABLE = "Islands & Communities";
 /** Only these fields are requested. Internal fields never leave Airtable. */
-const FIELDS = ["Name", "Slug", "Type", "Area", "Parent", "Sort Order", "Overview", "At a Glance", "Questions and Answers", "Publication Status"];
+const FIELDS = ["Name", "Slug", "Type", "Area", "Parent", "Sort Order", "Overview", "At a Glance", "Questions and Answers", "Publication Status", "Summary", "SEO Title", "SEO Description", "Latitude", "Longitude"];
 
 const str = (v: unknown) => (typeof v === "string" ? v.trim() : "");
+const num = (v: unknown) => (typeof v === "number" && Number.isFinite(v) ? v : undefined);
 
 /** "Label | Value | Source | YYYY-MM-DD", one per line. Lines without a source and a date are dropped. */
 export function parseFacts(text: string): Fact[] {
@@ -164,6 +172,11 @@ async function fetchPlaces(): Promise<Place[]> {
         overview: str(f["Overview"]),
         facts: parseFacts(str(f["At a Glance"])),
         qa: parseQA(str(f["Questions and Answers"])),
+        summary: str(f["Summary"]) || undefined,
+        seoTitle: str(f["SEO Title"]) || undefined,
+        seoDescription: str(f["SEO Description"]) || undefined,
+        latitude: num(f["Latitude"]),
+        longitude: num(f["Longitude"]),
       });
     }
     offset = json.offset;

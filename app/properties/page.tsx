@@ -5,11 +5,17 @@ import { PropertyCard, ReservedCard } from "@/components/site/PropertyCard";
 import { getPlace, getProperties } from "@/lib/content";
 import { SAMPLE_NOTICE } from "@/lib/content/sample";
 
-export const metadata: Metadata = {
+const BASE_METADATA: Metadata = {
   title: "Properties",
   description: "Curated waterfront residences across the Florida Keys, selected by James Papagno.",
   alternates: { canonical: "/properties" },
 };
+
+/** Filtered results are a view of /properties: they point to it and stay out of search indexes. */
+export async function generateMetadata({ searchParams }: { searchParams: Search }): Promise<Metadata> {
+  const { island, price } = await searchParams;
+  return island || price ? { ...BASE_METADATA, robots: { index: false, follow: true } } : BASE_METADATA;
+}
 
 export const revalidate = 300;
 

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageContextScript } from "@/components/PageContextScript";
+import { PlaceJsonLd } from "@/components/PlaceJsonLd";
 import { PropertyCard } from "@/components/site/PropertyCard";
 import { getChildren, getPlace, getPlaces, getProperties, type Place } from "@/lib/content";
 
@@ -23,8 +24,11 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const { island } = await params;
   const place = await load(island);
   if (!place) return {};
+  const description = place.seoDescription || place.summary;
   return {
-    title: place.type === "region" ? `Islands of ${place.name}` : `Living on ${place.name}`,
+    // An SEO title from the content source already carries the brand, so it is used as written.
+    title: place.seoTitle ? { absolute: place.seoTitle } : place.type === "region" ? `Islands of ${place.name}` : `Living on ${place.name}`,
+    ...(description ? { description } : {}),
     alternates: { canonical: `/islands/${place.slug}` },
   };
 }
@@ -60,13 +64,14 @@ export default async function Page({ params }: { params: Params }) {
     return (
       <main>
         <PageContextScript page_type="island_index" journey="buyer" />
+        <PlaceJsonLd place={place} trail={[]} />
         <section className="bg-sand">
           <div className="wrap py-[clamp(56px,8vw,112px)]">
             <Crumbs items={[{ label: "Islands", href: "/islands" }, { label: place.name }]} />
             <div className="rule" />
             <h1 className="display !text-[clamp(42px,6.4vw,84px)]">{place.name}</h1>
             <p className="mt-5 max-w-[680px] whitespace-pre-line text-[17px]">
-              {place.overview || `The ${place.name} guide is being written from first-hand knowledge and verified sources.`}
+              {place.overview || place.summary || `The ${place.name} guide is being written from first-hand knowledge and verified sources.`}
             </p>
           </div>
         </section>
@@ -95,6 +100,7 @@ export default async function Page({ params }: { params: Params }) {
   return (
     <main>
       <PageContextScript page_type="island_guide" journey="buyer" island_id={place.slug} />
+      <PlaceJsonLd place={place} trail={region ? [region] : []} />
       <section className="bg-sand">
         <div className="wrap py-[clamp(56px,8vw,112px)]">
           <Crumbs
@@ -107,7 +113,8 @@ export default async function Page({ params }: { params: Params }) {
           <div className="rule" />
           <h1 className="display !text-[clamp(42px,6.4vw,84px)]">{place.name}</h1>
           {place.area && <div className="label mt-3 text-mute">{place.area}</div>}
-          {!hasGuide && (
+          {place.summary && <p className="mt-5 max-w-[680px] text-[19px] leading-relaxed">{place.summary}</p>}
+          {!hasGuide && !place.summary && (
             <p className="mt-5 max-w-[620px] text-[17px]">
               The {place.name} island guide is being written from first-hand knowledge and verified sources.
             </p>
