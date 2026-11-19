@@ -7,8 +7,15 @@
  *
  * Publication gate: only Properties with Publication Status = Approved, and only
  * Property Media with Rights Cleared ticked, are ever returned.
+ *
+ * The labelled sample listing is served only while the site is in PREVIEW (see
+ * lib/content/mode.ts). Once the site is PUBLISHED, no approved property means an
+ * empty list, never sample content.
  */
-import { ISLANDS, SAMPLE_PROPERTIES, type Photo, type Property } from "@/lib/content/sample";
+import { PREVIEW } from "@/lib/content/mode";
+import { SAMPLE_PROPERTIES, type Photo, type Property } from "@/lib/content/sample";
+
+const SAMPLE_FALLBACK: Property[] = PREVIEW ? SAMPLE_PROPERTIES : [];
 
 const BASE = process.env.AIRTABLE_BASE_ID ?? "appJNZcT05lithwCl";
 const TOKEN = process.env.AIRTABLE_TOKEN;
@@ -44,7 +51,12 @@ const str = (v: unknown) => (typeof v === "string" ? v.trim() : "");
 const num = (v: unknown) => (typeof v === "number" ? v : undefined);
 const fmt = (n: number) => n.toLocaleString("en-US");
 
-function toProperty(rec: AirtableRecord, islandsById: Map<string, AirtableRecord>, media: AirtableRecord[]): Property | null {
+function toProperty(
+  rec: AirtableRecord,
+  islandsById: Map<string, AirtableRecord>,
+  regionNameBySlug: Map<string, string>,
+  media: AirtableRecord[],
+): Property | null {
   const f = rec.fields;
   const address = str(f["Address"]);
   const slug = str(f["Slug"]);
@@ -88,7 +100,7 @@ function toProperty(rec: AirtableRecord, islandsById: Map<string, AirtableRecord
     slug,
     island,
     islandName: islandRec ? str(islandRec.fields["Name"]) : "",
-    region: "Florida Keys",
+    region: (islandRec && regionNameBySlug.get(str(islandRec.fields["Parent"]))) || "",
     address,
     headline: str(f["Headline"]),
     description: str(f["Description"]),
@@ -107,21 +119,24 @@ function toProperty(rec: AirtableRecord, islandsById: Map<string, AirtableRecord
 }
 
 export async function getProperties(): Promise<Property[]> {
-  if (!TOKEN) return SAMPLE_PROPERTIES;
+  if (!TOKEN) return SAMPLE_FALLBACK;
   try {
-    const [props, islands, media] = await Promise.all([
+    const [props, places, media] = await Promise.all([
       list("Properties", `{Publication Status} = 'Approved'`),
-      list("Islands & Communities", `{Type} = 'Island'`),
+      list("Islands & Communities", `OR({Type} = 'Island', {Type} = 'Region')`),
       list("Property Media", `{Rights Cleared} = 1`),
     ]);
-    const islandsById = new Map(islands.map((i) => [i.id, i]));
+    const islandsById = new Map(places.filter((i) => str(i.fields["Type"]) === "Island").map((i) => [i.id, i]));
+    const regionNameBySlug = new Map(
+      places.filter((i) => str(i.fields["Type"]) === "Region").map((i) => [str(i.fields["Slug"]), str(i.fields["Name"])]),
+    );
     const live = props
-      .map((r) => toProperty(r, islandsById, media))
+      .map((r) => toProperty(r, islandsById, regionNameBySlug, media))
       .filter((x): x is Property => x !== null && x.photos.length > 0);
-    return live.length > 0 ? live : SAMPLE_PROPERTIES;
+    return live.length > 0 ? live : SAMPLE_FALLBACK;
   } catch (err) {
-    console.error("Airtable unavailable, serving sample content:", err);
-    return SAMPLE_PROPERTIES;
+    console.error("Airtable unavailable:", err);
+    return SAMPLE_FALLBACK;
   }
 }
 
@@ -137,4 +152,4 @@ export function pickPhoto(photos: Photo[], used: Set<string>, prefer: string[] =
   return chosen;
 }
 
-export { ISLANDS };
+export { getChildren, getPlace, getPlaces, getRegionGroups, type Place, type RegionGroup } from "@/lib/content/places";

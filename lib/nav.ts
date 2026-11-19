@@ -1,4 +1,3 @@
-import { ISLANDS } from "@/lib/content/sample";
 import { signInUrl, signUpUrl } from "@/lib/desk";
 
 export interface NavGroup {
@@ -7,8 +6,16 @@ export interface NavGroup {
   items: { label: string; href: string }[];
 }
 
-/** Approved seven-item primary navigation (Stage 01, decision C-3). "Inquire" is rendered as the header button. */
-export const NAV: NavGroup[] = [
+export interface NavRegion {
+  name: string;
+  slug: string;
+}
+
+/**
+ * Approved seven-item primary navigation (Stage 01, decision C-3). "Inquire" is rendered as the header button.
+ * The Islands menu lists regions, not every island: each region opens its own page with its islands.
+ */
+export const buildNav = (regions: NavRegion[]): NavGroup[] => [
   {
     label: "Properties",
     href: "/properties",
@@ -25,8 +32,8 @@ export const NAV: NavGroup[] = [
     label: "Islands",
     href: "/islands",
     items: [
-      { label: "Florida Keys Overview", href: "/islands" },
-      ...ISLANDS.map((i) => ({ label: i.name, href: `/islands/${i.slug}` })),
+      { label: "All Islands", href: "/islands" },
+      ...regions.map((r) => ({ label: r.name, href: `/islands/${r.slug}` })),
     ],
   },
   {

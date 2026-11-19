@@ -20,22 +20,6 @@ export const SITE = {
   nmls: "461234",
 };
 
-export interface Island {
-  slug: string;
-  name: string;
-  area: string;
-}
-
-export const ISLANDS: Island[] = [
-  { slug: "key-largo", name: "Key Largo", area: "Upper Keys" },
-  { slug: "islamorada", name: "Islamorada", area: "Upper Keys" },
-  { slug: "marathon", name: "Marathon", area: "Middle Keys" },
-  { slug: "big-pine-key", name: "Big Pine Key", area: "Lower Keys" },
-  { slug: "summerland-key", name: "Summerland Key", area: "Lower Keys" },
-  { slug: "sugarloaf-key", name: "Sugarloaf Key", area: "Lower Keys" },
-  { slug: "key-west", name: "Key West", area: "Lower Keys" },
-];
-
 export const COLLECTIONS = [
   "Legacy Homes",
   "The Boater’s Edit",
